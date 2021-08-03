@@ -19,6 +19,14 @@
 
 	//секция переменных============================================
 	let myip = document.location.hostname;
+	let configSetupJsonUrl = "http://" + myip + "/config.setup.json";
+
+	let showprogress = [];
+	let showerr = [];
+	let showOK = [];
+
+	var myObj = { configSetupJson: "{}" };
+	//===============================================================
 	let configSetupJson = "{}";
 
 	const setMain = "Устройство";
@@ -43,7 +51,8 @@
 
 	//функции=======================================================
 	onMount(async () => {
-		getСonfigSetupJson();
+		//getСonfigSetupJson();
+		//getJson(configSetupJsonUrl, 123, myObj);
 	});
 
 	async function getMqttData() {
@@ -66,9 +75,12 @@
 			}
 		);
 		if (res.ok) {
-			pushGreen("Saved!");
+			//pushGreen("Saved!");
+			alert("ok");
 		} else {
-			//pushRed();
+			//let status =  await res.status();
+			alert("error");
+			//pushGreen("error");
 		}
 
 		//if (res.ok) {
@@ -93,8 +105,45 @@
 		getValues();
 	}
 
+	//---------------- set /get data ------------------
+	async function handleSubmit(url, id) {
+		try {
+			showprogress[id] = true;
+			showerr[id] = false;
+			showOK[id] = false;
+
+			pushGreen("saving...", 500);
+
+			let res = await fetch(url);
+
+			if (res.ok) {
+				console.log("ok", res.status);
+				configSetupJson = await res.json();
+
+				showprogress[id] = false;
+				showerr[id] = false;
+				showOK[id] = true;
+			} else {
+				console.log("error", res.status);
+				showprogress[id] = false;
+				showerr[id] = true;
+				showOK[id] = false;
+			}
+		} catch (e) {
+			console.log(e);
+			showprogress[id] = false;
+			showerr[id] = true;
+			showOK[id] = false;
+		}
+	}
+
 	function parseСonfigSetupJson(key) {
 		let result = configSetupJson[key];
+		return result;
+	}
+
+	function parseJson(key, obj) {
+		let result = obj.configSetupJson[key];
 		return result;
 	}
 
@@ -109,9 +158,9 @@
 		mqttPass = parseСonfigSetupJson("mqttPass");
 	}
 
-	function pushGreen(text) {
+	function pushGreen(text, duration) {
 		toast.push(text, {
-			duration: 500,
+			duration: duration,
 			theme: {
 				"--toastBackground": "#48BB78",
 				"--toastProgressBackground": "#2F855A",
@@ -119,8 +168,9 @@
 		});
 	}
 
-	function pushRed() {
-		toast.push("Error!", {
+	function pushRed(text) {
+		toast.push(text, {
+			duration: 2000,
 			theme: {
 				"--toastBackground": "#F56565",
 				"--toastProgressBackground": "#C53030",
@@ -144,6 +194,7 @@
 	<label class="menu__btn" for="menu__toggle">
 		<span />
 	</label>
+
 	<ul class="menu__box">
 		<li>
 			<a class="menu__item" href="/" on:click={getСonfigSetupJson}
@@ -168,16 +219,13 @@
 		<Route path="/">
 			<div class="head">
 				<h2>{setMain}</h2>
-				<button type="button" on:click={getСonfigSetupJson}
-					>Get request</button
+				<button
+					type="button"
+					on:click={function () {
+						handleSubmit(configSetupJsonUrl, 1);
+					}}>Get request TEST2</button
 				>
-				<button type="button" on:click={upgrade}
-					>Всплывающее окно</button
-				>
-				<p>Result:</p>
-				<pre>
-				{parseСonfigSetupJson("name")}
-				</pre>
+				<p>{configSetupJson ? JSON.stringify(configSetupJson) : ""}</p>
 			</div>
 		</Route>
 
@@ -211,9 +259,7 @@
 
 							<div class="row">
 								<div class="center-column">
-									<button
-										type="button"
-										on:click={getMqttData}
+									<button type="button" on:click={getMqttData}
 										>Сохранить
 									</button>
 								</div>
@@ -291,9 +337,7 @@
 
 							<div class="row">
 								<div class="center-column">
-									<button
-										type="button"
-										on:click={getMqttData}
+									<button type="button" on:click={getMqttData}
 										>Сохранить
 									</button>
 								</div>
@@ -304,6 +348,18 @@
 			</div>
 		</Route>
 	</ul>
+</div>
+
+<div class="navbar">
+	<lable style="display : {showprogress[1] ? ' inline' : 'none'}"
+		><center>Загружаем данные</center></lable
+	>
+	<lable style="display : {showOK[1] ? ' inline' : 'none'}"
+		><center>Данные успешно загружены</center></lable
+	>
+	<lable style="display : {showerr[1] ? ' inline' : 'none'}"
+		><center>Не удалось получить данные</center></lable
+	>
 </div>
 
 <style>
@@ -440,5 +496,15 @@
 
 	label {
 		display: flex;
+	}
+
+	.navbar {
+		background-color: rgba(51, 51, 51, 0.144);
+		overflow: hidden;
+		position: fixed;
+		bottom: 5px;
+		width: 100%;
+		margin: 0;
+        padding: 0;
 	}
 </style>
