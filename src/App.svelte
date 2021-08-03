@@ -105,21 +105,16 @@
 		getValues();
 	}
 
-	//---------------- set /get data ------------------
+	//---------------- set/get data ------------------
 	async function handleSubmit(url, id) {
 		try {
 			showprogress[id] = true;
 			showerr[id] = false;
 			showOK[id] = false;
-
-			pushGreen("saving...", 500);
-
 			let res = await fetch(url);
-
 			if (res.ok) {
 				console.log("ok", res.status);
 				configSetupJson = await res.json();
-
 				showprogress[id] = false;
 				showerr[id] = false;
 				showOK[id] = true;
@@ -192,7 +187,7 @@
 <div class="hamburger-menu">
 	<input id="menu__toggle" type="checkbox" />
 	<label class="menu__btn" for="menu__toggle">
-		<span />
+		<span/>
 	</label>
 
 	<ul class="menu__box">
@@ -347,19 +342,21 @@
 				</div>
 			</div>
 		</Route>
-	</ul>
-</div>
 
-<div class="navbar">
-	<lable style="display : {showprogress[1] ? ' inline' : 'none'}"
-		><center>Загружаем данные</center></lable
-	>
-	<lable style="display : {showOK[1] ? ' inline' : 'none'}"
-		><center>Данные успешно загружены</center></lable
-	>
-	<lable style="display : {showerr[1] ? ' inline' : 'none'}"
-		><center>Не удалось получить данные</center></lable
-	>
+		<ul class="navbar">
+			<lable style="display : {showprogress[1] ? ' inline' : 'none'}"
+				><center>Загружаем данные</center></lable
+			>
+			<lable style="display : {showOK[1] ? ' inline' : 'none'}"
+				><center>Данные успешно загружены</center></lable
+			>
+			<lable style="display : {showerr[1] ? ' inline' : 'none'}"
+				><center>Не удалось получить данные</center></lable
+			>
+		</ul>
+
+
+	</ul>
 </div>
 
 <style>
@@ -383,7 +380,7 @@
 		left: 0;
 	}
 	#menu__toggle:checked ~ .menu__main {
-		margin-left: 150px; /* размер выхода бокового меню */
+		margin-left: 150px; /* насколько сужать правую часть */
 	}
 
 	.menu__btn {
@@ -505,6 +502,6 @@
 		bottom: 5px;
 		width: 100%;
 		margin: 0;
-        padding: 0;
+		padding: 0;
 	}
 </style>
